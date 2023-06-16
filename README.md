@@ -1,6 +1,6 @@
 # Ororsomafofo
 
-** Ororsomafofo is an event dispatcher for rust application**
+**Ororsomafofo is an event dispatcher for rust application**
 
 ## Example
 ```rust
