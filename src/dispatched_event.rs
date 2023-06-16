@@ -12,7 +12,7 @@ impl DispatchedEvent {
     /// Returns the actual instance of the event
     /// ```
     /// # use async_trait::async_trait;
-    /// # use soma::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
+    /// # use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
     /// # use tokio::time::{sleep, Duration};
     ///
     /// # #[tokio::main]
@@ -25,7 +25,7 @@ impl DispatchedEvent {
     ///
     ///    struct MyEventHandler;
     ///    
-    ///    #[soma::async_trait]
+    ///    #[orsomafo::async_trait]
     ///    impl EventHandler for MyEventHandler {
     ///        async fn handle(&self, dispatched: &DispatchedEvent)  {
     ///           let event: MyEvent = dispatched.the_event().unwrap();

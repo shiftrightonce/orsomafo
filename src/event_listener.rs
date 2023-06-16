@@ -6,7 +6,7 @@ use crate::{
 use std::collections::HashMap;
 use tokio::sync::mpsc::UnboundedReceiver;
 
-pub(crate) const LOG_TITLE: &str = "soma";
+pub(crate) const LOG_TITLE: &str = "orsomafo";
 pub(crate) type SubscriberList = HashMap<String, Vec<Box<dyn EventHandler>>>;
 
 pub struct Subscriber {

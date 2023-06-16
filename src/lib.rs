@@ -1,24 +1,24 @@
-//! # Soma
-//! Soma is a event dispatcher
+//! # Ororsomafofo
+//! Ororsomafofo is a event dispatcher
 //!
 //! Events are dispatchable across threads. Handlers are executed asynchronously
 //!
 //! ## Example
 //! ```
 //! # use async_trait::async_trait;
-//! # use soma::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
+//! # use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
 //! # use tokio::time::{sleep, Duration};
 //!
 //! #[derive(Clone, Debug)] // Event must be cloneable
 //! struct MyEvent;
 //!
-//! impl soma::Dispatchable for MyEvent {} // MyEvent is now dispatchable
+//! impl orsomafo::Dispatchable for MyEvent {} // MyEvent is now dispatchable
 //!
 //!  // create a handler
 //!  struct MyEventHandler;
 //!    
-//!  #[soma::async_trait]
-//!   impl soma::EventHandler for MyEventHandler {
+//!  #[orsomafo::async_trait]
+//!   impl orsomafo::EventHandler for MyEventHandler {
 //!        // called when event from "MyEvent" is dispatched
 //!        async fn handle(&self, dispatched: &DispatchedEvent)  {
 //!           let event: MyEvent = dispatched.the_event().unwrap();  // Get the instance of "MyEvent"

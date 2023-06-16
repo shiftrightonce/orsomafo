@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use soma::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler, Subscriber};
+use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler, Subscriber};
 use tokio::time::{sleep, Duration};
 
 #[tokio::main]

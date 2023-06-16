@@ -16,7 +16,7 @@ pub trait Dispatchable: Send + Sync {
     /// Call this method when you are ready to dispatch the event
     /// ```
     /// # use async_trait::async_trait;
-    /// # use soma::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
+    /// # use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
     /// # use tokio::time::{sleep, Duration};
     ///
     /// # #[tokio::main]
@@ -46,7 +46,7 @@ pub trait EventHandler: Send + Sync + 'static {
     /// The "handle" method will be called when an event is ready
     /// ```
     /// # use async_trait::async_trait;
-    /// # use soma::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
+    /// # use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
     /// # use tokio::time::{sleep, Duration};
     ///
     /// # #[tokio::main]
@@ -55,7 +55,7 @@ pub trait EventHandler: Send + Sync + 'static {
     ///
     ///    struct MyEventHandler;
     ///    
-    ///    #[soma::async_trait]
+    ///    #[orsomafo::async_trait]
     ///    impl EventHandler for MyEventHandler {
     ///        async fn handle(&self, event: &DispatchedEvent)  {
     ///           //...
