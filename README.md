@@ -1,24 +1,24 @@
-# Soma
+# Ororsomafofo
 
-** Soma is an event dispatcher for rust application**
+** Ororsomafofo is an event dispatcher for rust application**
 
 ## Example
 ```rust
 
- # use async_trait::async_trait;
- # use soma::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
- # use tokio::time::{sleep, Duration};
+use async_trait::async_trait;
+use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
+use tokio::time::{sleep, Duration};
 
  #[derive(Clone, Debug)] // Event must be cloneable
  struct MyEvent;
 
- impl soma::Dispatchable for MyEvent {} // MyEvent is now dispatchable
+ impl orsomafo::Dispatchable for MyEvent {} // MyEvent is now dispatchable
 
   // create a handler
   struct MyEventHandler;
     
-  #[soma::async_trait]
-   impl soma::EventHandler for MyEventHandler {
+  #[orsomafo::async_trait]
+   impl orsomafo::EventHandler for MyEventHandler {
         // called when event from "MyEvent" is dispatched
         async fn handle(&self, dispatched: &DispatchedEvent)  {
            let event: MyEvent = dispatched.the_event().unwrap();  // Get the instance of "MyEvent"
@@ -40,7 +40,7 @@
 ```
 
 ## Examples
-The [examples](https://github.com/shiftrightonce/soma/tree/main/examples) folder contains simple and full examples. If none of the examples are helpful,
+The [examples](https://github.com/shiftrightonce/orsomafo/tree/main/examples) folder contains simple and full examples. If none of the examples are helpful,
 please reach out with your use case and I  try to provide one.
 
 
