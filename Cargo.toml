@@ -2,6 +2,11 @@
 name = "soma"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "Event dispatcher crate"
+repository = "https://github.com/shiftrightonce/soma"
+rust-version = "1.70"
+keywords = ["webdev", "web", "event", "event-dispatcher"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
