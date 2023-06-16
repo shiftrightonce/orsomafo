@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 description = "Event dispatcher crate"
-repository = "https://github.com/shiftrightonce/soma"
+repository = "https://github.com/shiftrightonce/orsomafo"
 rust-version = "1.70"
 keywords = ["webdev", "web", "event", "event-dispatcher"]
 
