@@ -6,7 +6,7 @@ use tokio::time::{sleep, Duration};
 async fn main() {
     pretty_env_logger::init();
 
-    // 1. Subscriber allows you to register a list of event listeners and .
+    // 1. Subscriber allows you to register a list of event listeners.
     let mut handlers = Subscriber::new();
     handlers
         .listen::<UserCreated>(SendWelcomeEmail("noreplay@example.com".into()).to_handler())
