@@ -28,6 +28,7 @@ async fn main() {
     });
 
     handle.join().unwrap();
+
     // pause for a bit
     sleep(Duration::from_millis(100)).await;
 }
