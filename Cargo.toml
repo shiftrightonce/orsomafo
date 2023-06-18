@@ -7,7 +7,7 @@ description = "Event dispatcher crate"
 repository = "https://github.com/shiftrightonce/orsomafo"
 rust-version = "1.70"
 keywords = ["webdev", "web", "event", "event-dispatcher"]
-categories = ["asynchronous", "web", "webdev", "event", "event-dispatcher"]
+categories = ["asynchronous", "web-programming"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
