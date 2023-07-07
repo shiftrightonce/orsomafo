@@ -10,8 +10,8 @@ async fn main() {
     // 1. Subscriber allows you to register a list of event listeners and .
     let mut handlers = Subscriber::new();
     handlers
-        .listen::<UserCreated>(SendWelcomeEmail("noreplay@example.com".into()).to_handler())
-        .listen::<UserCreated>(HandleUserCreated.to_handler());
+        .listen::<UserCreated, SendWelcomeEmail>()
+        .listen::<UserCreated, HandleUserCreated>();
 
     let _ = EventDispatcherBuilder::new()
         // 2. Use the "subscribe" method on the builder to subscribe to the list of events
@@ -40,6 +40,7 @@ struct UserCreated {
 
 impl Dispatchable for UserCreated {}
 
+#[derive(Default)]
 struct HandleUserCreated;
 
 #[async_trait]
@@ -51,6 +52,12 @@ impl EventHandler for HandleUserCreated {
 }
 
 struct SendWelcomeEmail(String);
+
+impl Default for SendWelcomeEmail {
+    fn default() -> Self {
+        Self("noreplay@example.com".into())
+    }
+}
 
 #[async_trait]
 impl EventHandler for SendWelcomeEmail {

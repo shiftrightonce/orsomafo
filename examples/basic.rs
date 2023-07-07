@@ -10,9 +10,9 @@ async fn main() {
     //    listeners
     let dispatcher = EventDispatcherBuilder::new()
         // 2. On the builder instance, use the `listen` method to register a handler for an event.
-        //    listen::<The event you want to listen for>(The instance of your handler).
+        //    listen::<The event you want to listen for, The handler>().
         //    All handler must implement `EventHandler`
-        .listen::<UserCreated>(HandleUserCreated.to_handler())
+        .listen::<UserCreated, HandleUserCreated>()
         .build()
         .await;
 
@@ -43,6 +43,7 @@ struct UserCreated {
 impl Dispatchable for UserCreated {}
 
 // 7. Create an event handler
+#[derive(Default)]
 struct HandleUserCreated;
 
 // 8. Event handler must implement "soma::EventHandler"
