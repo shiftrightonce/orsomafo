@@ -15,6 +15,7 @@
 //! impl orsomafo::Dispatchable for MyEvent {} // MyEvent is now dispatchable
 //!
 //!  // create a handler
+//!  #[derive(Default)]  // Event handler must implement default
 //!  struct MyEventHandler;
 //!    
 //!  #[orsomafo::async_trait]
@@ -29,7 +30,7 @@
 //!  #[tokio::main]
 //!  async fn main() {
 //!   _ =  EventDispatcherBuilder::new()
-//!         .listen::<MyEvent>(MyEventHandler.to_handler()) // Register "MyEventHandler" for "MyEvent"
+//!         .listen::<MyEvent, MyEventHandler>() // Register "MyEventHandler" for "MyEvent"
 //!         .build().await;
 //!
 //!    let event = MyEvent;
@@ -37,6 +38,7 @@
 //!
 //! }
 mod builder;
+mod closure_handler_wrapper;
 mod dispatched_event;
 mod event;
 mod event_dispatcher;
