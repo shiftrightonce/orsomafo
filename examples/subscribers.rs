@@ -7,8 +7,7 @@ async fn main() {
     pretty_env_logger::init();
 
     // 1. Subscriber allows you to register a list of event listeners.
-    let mut handlers = Subscriber::new();
-    handlers
+    let handlers = Subscriber::new()
         .listen::<UserCreated, SendWelcomeEmail>()
         .listen::<UserCreated, HandleUserCreated>();
 
@@ -16,6 +15,15 @@ async fn main() {
         // 2. Use the "subscribe" method on the builder to subscribe to the list of events
         .subscribe(handlers)
         .build()
+        .await;
+
+    // 3. Another way to register subscribers
+    //    A crate can use this method to register it's specific
+    //    event handlers
+    Subscriber::new()
+        .listen::<UserCreated, SendWelcomeEmail>()
+        .listen::<UserCreated, HandleUserCreated>()
+        .build() // Same as "subscribe" on the builder
         .await;
 
     let user = UserCreated { id: 1 };

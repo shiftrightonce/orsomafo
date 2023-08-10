@@ -4,11 +4,14 @@ use crate::{
     dispatched_event::DispatchedEvent,
     event::{Dispatchable, EventHandler},
 };
-use std::{collections::HashMap, future::Future};
-use tokio::sync::mpsc::UnboundedReceiver;
+use std::{collections::HashMap, future::Future, sync::OnceLock};
+use tokio::sync::{mpsc::UnboundedReceiver, RwLock};
 
 pub(crate) const LOG_TITLE: &str = "orsomafo";
 pub(crate) type SubscriberList = HashMap<String, Vec<Box<dyn EventHandler>>>;
+
+// List of registered subscribers/listeners
+static REGISTERED_SUBSCRIBERS: OnceLock<RwLock<SubscriberList>> = OnceLock::new();
 
 #[derive(Default)]
 pub struct Subscriber {
@@ -23,25 +26,25 @@ impl Subscriber {
     }
 
     // TODO: complete implementation that will allow closure to be used as a handler
-    fn listen_fn<E: Dispatchable, F, Fut>(&mut self, handler: F) -> &mut Self
+    fn listen_fn<E: Dispatchable, F, Fut>(self, handler: F) -> Self
     where
         F: Fn(&DispatchedEvent) -> Fut + Clone + Send + Sync + 'static,
         Fut: Future + Send + Sync + 'static,
     {
-        let wraper = ClosureHandlerWrapper(Some(handler));
+        let wrapper = ClosureHandlerWrapper(Some(handler));
         let event = E::event();
 
-        self.register(event, wraper.to_handler())
+        self.register(event, wrapper.to_handler())
     }
 
-    pub fn listen<E: Dispatchable, H: EventHandler + Default>(&mut self) -> &mut Self {
+    pub fn listen<E: Dispatchable, H: EventHandler + Default>(self) -> Self {
         let event = E::event();
         let handler = H::default().to_handler();
 
         self.register(event, handler)
     }
 
-    fn register(&mut self, event_name: String, handler: Box<dyn EventHandler>) -> &mut Self {
+    fn register(mut self, event_name: String, handler: Box<dyn EventHandler>) -> Self {
         if self.subscribers.get(&event_name).is_none() {
             self.subscribers.insert(event_name.clone(), Vec::new());
         }
@@ -65,22 +68,24 @@ impl Subscriber {
 
         self
     }
+
+    /// Apply listeners to the event listeners queue
+    pub async fn build(self) {
+        merge_subscribers(self.subscribers).await;
+    }
 }
 
 pub(crate) struct EventListener {
     chan_rev: UnboundedReceiver<(String, DispatchedEvent)>,
-    subscribers: SubscriberList,
 }
 
 impl EventListener {
-    pub fn new(
+    pub async fn new(
         subscribers: SubscriberList,
         receiver: UnboundedReceiver<(String, DispatchedEvent)>,
     ) -> Self {
-        Self {
-            chan_rev: receiver,
-            subscribers,
-        }
+        merge_subscribers(subscribers).await;
+        Self { chan_rev: receiver }
     }
 
     pub async fn receive(&mut self) {
@@ -91,18 +96,48 @@ impl EventListener {
                 &event.0
             );
 
-            if let Some(subscribers) = self.subscribers.get(&event.0) {
-                for a_subscriber in subscribers {
-                    log::trace!(
-                        target: LOG_TITLE,
-                        "calling handler: {:?}, for event: {:?}",
-                        &a_subscriber.handler_id(),
-                        &event.0
-                    );
+            if let Some(lock) = REGISTERED_SUBSCRIBERS.get() {
+                let mut list = lock.write().await;
+                if let Some(subscribers) = list.get_mut(&event.0) {
+                    let mut to_remove = Vec::new();
+                    for a_subscriber in subscribers.iter().enumerate() {
+                        log::trace!(
+                            target: LOG_TITLE,
+                            "calling handler: {:?}, for event: {:?}",
+                            &a_subscriber.1.handler_id(),
+                            &event.0
+                        );
 
-                    a_subscriber.handle(&event.1).await
+                        a_subscriber.1.handle(&event.1).await;
+                        if a_subscriber.1.execute_once() {
+                            to_remove.push(a_subscriber.0);
+                            // subscribers.remove(a_subscriber.0);
+                        }
+
+                        if a_subscriber.1.propagate() == false {
+                            break;
+                        }
+                    }
+
+                    if to_remove.is_empty() == false {
+                        for index in to_remove.into_iter() {
+                            subscribers.remove(index);
+                        }
+                    }
                 }
             }
         }
+    }
+}
+
+async fn merge_subscribers(subscribers: SubscriberList) {
+    let lock = REGISTERED_SUBSCRIBERS.get_or_init(|| RwLock::new(SubscriberList::new()));
+    let mut list = lock.write().await;
+    for entry in subscribers {
+        if !list.contains_key(&entry.0) {
+            list.insert(entry.0.clone(), Vec::new());
+        }
+
+        list.get_mut(&entry.0).unwrap().extend(entry.1);
     }
 }

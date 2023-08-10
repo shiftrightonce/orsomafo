@@ -27,9 +27,9 @@ impl EventDispatcherBuilder {
         F: Fn(&DispatchedEvent) -> Fut + Clone + Send + Sync + 'static,
         Fut: Future + Send + Sync + 'static,
     {
-        let wraper = ClosureHandlerWrapper(Some(handler));
+        let wrapper = ClosureHandlerWrapper(Some(handler));
 
-        self.register(event, wraper.to_handler())
+        self.register(event, wrapper.to_handler())
     }
 
     pub fn listen<E: Dispatchable, H: EventHandler + Default>(self) -> Self {
@@ -56,7 +56,7 @@ impl EventDispatcherBuilder {
         let subscribers = self.subscribers;
 
         tokio::spawn(async move {
-            let mut handler = EventListener::new(subscribers, rx);
+            let mut handler = EventListener::new(subscribers, rx).await;
             handler.receive().await;
         });
 

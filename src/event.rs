@@ -78,4 +78,14 @@ pub trait EventHandler: Send + Sync + 'static {
     fn handler_id(&self) -> String {
         std::any::type_name::<Self>().to_string()
     }
+
+    /// Executes this handler once and dequeue it if `true` is returned
+    fn execute_once(&self) -> bool {
+        false
+    }
+
+    /// Stops propagating the event to other handlers when `false` is returned
+    fn propagate(&self) -> bool {
+        true
+    }
 }
