@@ -1,5 +1,5 @@
-//! # Ororsomafofo
-//! Ororsomafofo is a event dispatcher
+//! # Orsomafofo
+//! Orsomafofo is a event dispatcher
 //!
 //! Events are dispatchable across threads. Handlers are executed asynchronously
 //!
