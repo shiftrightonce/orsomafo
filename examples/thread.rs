@@ -8,8 +8,7 @@ async fn main() {
     pretty_env_logger::init();
 
     // 1. Subscriber allows you to register a list of event listeners and .
-    let mut handlers = Subscriber::new();
-    handlers
+    let handlers = Subscriber::new()
         .listen::<UserCreated, SendWelcomeEmail>()
         .listen::<UserCreated, HandleUserCreated>();
 
