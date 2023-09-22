@@ -1,8 +1,9 @@
-# Orsomafo 
+# Orsomafo
 
-**Orsomafo is an event dispatcher for rust application**
+Orsomafo is an event dispatcher for rust application
 
 ## Example
+
 ```rust
 
 use async_trait::async_trait;
@@ -40,13 +41,14 @@ use tokio::time::{sleep, Duration};
 ```
 
 ## Examples
+
 The [examples](https://github.com/shiftrightonce/orsomafo/tree/main/examples) folder contains simple and full examples. If none of the examples are helpful,
 please reach out with your use case and I  try to provide one.
 
 
 ## Feedback
-If you find this crate useful, please star the repository. Submit your issues and recommendations as well.
 
+If you find this crate useful, please star the repository. Submit your issues and recommendations as well.
 
 ## License
 
