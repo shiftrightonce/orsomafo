@@ -51,3 +51,9 @@ pub use event::*;
 pub use event_dispatcher::event_dispatcher;
 pub use event_dispatcher::EventDispatcher;
 pub use event_listener::Subscriber;
+
+///! A simple way to setup the dispatcher
+///!
+pub async fn setup() {
+    EventDispatcherBuilder::new().build().await;
+}
