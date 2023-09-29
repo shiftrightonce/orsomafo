@@ -229,7 +229,7 @@ dependencies = [
 
 [[package]]
 name = "orsomafo"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "async-trait",
  "log",
