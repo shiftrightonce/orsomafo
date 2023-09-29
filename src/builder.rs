@@ -4,7 +4,7 @@ use crate::{
     dispatched_event::DispatchedEvent,
     event::{Dispatchable, EventHandler},
     event_dispatcher::{EventDispatcher, EVENT_DISPATCHER},
-    event_listener::{EventListener, Subscriber, SubscriberList, LOG_TITLE},
+    event_listener::{merge_subscribers, EventListener, Subscriber, SubscriberList, LOG_TITLE},
 };
 use std::{future::Future, sync::Arc};
 use tokio::sync::mpsc::{self};
@@ -40,7 +40,12 @@ impl EventDispatcherBuilder {
 
     pub fn subscribe(mut self, subscriber: Subscriber) -> Self {
         for name_and_handlers in subscriber.subscribers {
-            println!("subscriber event: {:#}", &name_and_handlers.0);
+            log::trace!(
+                target: LOG_TITLE,
+                "subscriber event: {:?}",
+                &name_and_handlers.0,
+            );
+
             if let Some(collection) = self.subscribers.get_mut(&name_and_handlers.0) {
                 collection.extend(name_and_handlers.1);
             } else {
@@ -52,19 +57,25 @@ impl EventDispatcherBuilder {
     }
 
     pub async fn build(self) -> Arc<EventDispatcher> {
-        let (tx, rx) = mpsc::unbounded_channel::<(String, DispatchedEvent)>();
-        let subscribers = self.subscribers;
+        if let Some(dispatcher) = EVENT_DISPATCHER.get() {
+            let subscribers = self.subscribers;
+            merge_subscribers(subscribers).await;
+            dispatcher.clone()
+        } else {
+            let (tx, rx) = mpsc::unbounded_channel::<(String, DispatchedEvent)>();
+            let subscribers = self.subscribers;
 
-        tokio::spawn(async move {
-            let mut handler = EventListener::new(subscribers, rx).await;
-            handler.receive().await;
-        });
+            tokio::spawn(async move {
+                let mut handler = EventListener::new(subscribers, rx).await;
+                handler.receive().await;
+            });
 
-        let dispatcher = Arc::new(EventDispatcher::new(tx));
+            let dispatcher = Arc::new(EventDispatcher::new(tx));
 
-        _ = EVENT_DISPATCHER.set(dispatcher.clone());
+            _ = EVENT_DISPATCHER.set(dispatcher.clone());
 
-        dispatcher
+            dispatcher
+        }
     }
 
     fn register(mut self, event: String, handler: Box<dyn EventHandler>) -> Self {
