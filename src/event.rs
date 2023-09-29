@@ -1,7 +1,12 @@
-use crate::{dispatched_event::DispatchedEvent, event_dispatcher::event_dispatcher};
+use crate::{
+    dispatched_event::DispatchedEvent,
+    event_dispatcher::event_dispatcher,
+    event_listener::{merge_subscribers, SubscriberList, LOG_TITLE},
+};
 use async_trait::async_trait;
 
 /// Types that are dispatchable must implement this trait
+#[async_trait]
 pub trait Dispatchable: Send + Sync {
     /// By default name of the type is used as the event name
     /// It is recommended to leave this as it is if you don't
@@ -37,6 +42,28 @@ pub trait Dispatchable: Send + Sync {
         Self: Sized + 'static,
     {
         event_dispatcher().dispatch(self);
+    }
+
+    async fn subscribe<H: EventHandler + Default>()
+    where
+        Self: Sized,
+    {
+        crate::setup().await;
+
+        let event = Self::event();
+        let the_handler = H::default().to_handler();
+
+        let mut subscriber = SubscriberList::new();
+
+        log::trace!(
+            target: LOG_TITLE,
+            "registered handler: {:?}, for event: {:?}",
+            &event,
+            &the_handler.handler_id()
+        );
+
+        subscriber.insert(event, vec![the_handler]);
+        merge_subscribers(subscriber).await;
     }
 }
 
@@ -87,5 +114,36 @@ pub trait EventHandler: Send + Sync + 'static {
     /// Stops propagating the event to other handlers when `false` is returned
     fn propagate(&self) -> bool {
         true
+    }
+}
+
+mod test {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_event_dispatching() {
+        UserCreated::subscribe::<HandleUserCreated>().await;
+    }
+
+    #[derive(Clone)]
+    struct UserCreated {
+        id: u32,
+    }
+
+    impl Dispatchable for UserCreated {}
+
+    #[derive(Default)]
+    struct HandleUserCreated;
+
+    #[async_trait]
+    impl EventHandler for HandleUserCreated {
+        async fn handle(&self, dispatched: &DispatchedEvent) {
+            let the_event = dispatched.the_event();
+
+            assert_eq!(the_event.is_none(), true);
+
+            let event: UserCreated = the_event.unwrap();
+            assert_eq!(event.id, 200);
+        }
     }
 }

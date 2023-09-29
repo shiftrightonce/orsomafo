@@ -71,6 +71,7 @@ impl Subscriber {
 
     /// Apply listeners to the event listeners queue
     pub async fn build(self) {
+        crate::setup().await;
         merge_subscribers(self.subscribers).await;
     }
 }
@@ -111,7 +112,6 @@ impl EventListener {
                         a_subscriber.1.handle(&event.1).await;
                         if a_subscriber.1.execute_once() {
                             to_remove.push(a_subscriber.0);
-                            // subscribers.remove(a_subscriber.0);
                         }
 
                         if a_subscriber.1.propagate() == false {
@@ -130,7 +130,7 @@ impl EventListener {
     }
 }
 
-async fn merge_subscribers(subscribers: SubscriberList) {
+pub(crate) async fn merge_subscribers(subscribers: SubscriberList) {
     let lock = REGISTERED_SUBSCRIBERS.get_or_init(|| RwLock::new(SubscriberList::new()));
     let mut list = lock.write().await;
     for entry in subscribers {
@@ -139,5 +139,49 @@ async fn merge_subscribers(subscribers: SubscriberList) {
         }
 
         list.get_mut(&entry.0).unwrap().extend(entry.1);
+    }
+}
+
+mod test {
+    use async_trait::async_trait;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_subscribers_merging() {
+        Subscriber::new()
+            .listen::<UserCreated, HandleUserCreated>()
+            .build()
+            .await;
+
+        Subscriber::new()
+            .listen::<UserCreated, HandleUserCreated>()
+            .build()
+            .await;
+
+        let subscribers = REGISTERED_SUBSCRIBERS.get();
+        assert_eq!(subscribers.is_some(), true);
+    }
+
+    #[derive(Clone)]
+    struct UserCreated {
+        id: u32,
+    }
+
+    impl Dispatchable for UserCreated {}
+
+    #[derive(Default)]
+    struct HandleUserCreated;
+
+    #[async_trait]
+    impl EventHandler for HandleUserCreated {
+        async fn handle(&self, dispatched: &DispatchedEvent) {
+            let the_event = dispatched.the_event();
+
+            assert_eq!(the_event.is_none(), true);
+
+            let event: UserCreated = the_event.unwrap();
+            assert_eq!(event.id, 200);
+        }
     }
 }
