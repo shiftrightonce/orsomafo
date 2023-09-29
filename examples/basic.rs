@@ -7,7 +7,7 @@ async fn main() {
     pretty_env_logger::init(); // For logging purpose only.
 
     // 1. Create an instance EventDispatcherBuilder and use it to register
-    //    listeners
+    //    listeners. Note: You can create a dispatcher as many times as you like
     let dispatcher = EventDispatcherBuilder::new()
         // 2. On the builder instance, use the `listen` method to register a handler for an event.
         //    listen::<The event you want to listen for, The handler>().
@@ -43,6 +43,7 @@ struct UserCreated {
 impl Dispatchable for UserCreated {}
 
 // 7. Create an event handler
+//    The handler must implement default
 #[derive(Default)]
 struct HandleUserCreated;
 
