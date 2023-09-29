@@ -30,7 +30,7 @@ use tokio::time::{sleep, Duration};
   #[tokio::main]
   async fn main() {
    _ =  EventDispatcherBuilder::new()
-         .listen::<MyEvent>, MyEventHandler>()
+         .listen::<MyEvent, MyEventHandler>()
          .build().await;
 
     let event = MyEvent;
