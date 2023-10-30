@@ -14,7 +14,15 @@ categories = ["asynchronous", "web-programming"]
 [dependencies]
 async-trait = "0.1.68"
 log = "0.4.19"
-tokio = { version = "1.28.2", features = ["full"] }
+tokio = { version = "1.28.2", features = ["sync", "test-util", "macros"] }
+serde = { version = "1.0.190", features = ["derive"] }
+serde_json = { version = "1.0" }
 
 [dev-dependencies]
 pretty_env_logger = "0.5.0"
+tokio = { version = "1.28.2", features = [
+  "sync",
+  "test-util",
+  "macros",
+  "rt-multi-thread",
+] }
