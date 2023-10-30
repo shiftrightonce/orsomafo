@@ -9,7 +9,7 @@
 //! # use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
 //! # use tokio::time::{sleep, Duration};
 //!
-//! #[derive(Clone, Debug)] // Event must be cloneable
+//! #[derive(Clone, Debug,serde::Serialize, serde::Deserialize )] // Event must be cloneable
 //! struct MyEvent;
 //!
 //! impl orsomafo::Dispatchable for MyEvent {} // MyEvent is now dispatchable
@@ -43,7 +43,7 @@
 //! # use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
 //! # use tokio::time::{sleep, Duration};
 //!
-//! #[derive(Clone, Debug)] // Event must be cloneable
+//! #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)] // Event must be clonable
 //! struct MyEvent;
 //!
 //! impl orsomafo::Dispatchable for MyEvent {} // MyEvent is now dispatchable

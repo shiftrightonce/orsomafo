@@ -28,7 +28,7 @@ pub trait Dispatchable: serde::Serialize + serde::de::DeserializeOwned + Send + 
     /// # async fn main() {
     /// #  _ =  EventDispatcherBuilder::new().build().await;
     ///
-    ///    #[derive(Clone)]
+    ///    #[derive(Clone, serde::Serialize, serde::Deserialize)]
     ///    struct MyEvent;
     ///    impl Dispatchable for MyEvent {}
     ///
