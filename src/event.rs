@@ -7,7 +7,7 @@ use async_trait::async_trait;
 
 /// Types that are dispatchable must implement this trait
 #[async_trait]
-pub trait Dispatchable: Send + Sync {
+pub trait Dispatchable: serde::Serialize + serde::de::DeserializeOwned + Send + Sync {
     /// By default name of the type is used as the event name
     /// It is recommended to leave this as it is if you don't
     /// have any good reason to change it.
@@ -42,6 +42,10 @@ pub trait Dispatchable: Send + Sync {
         Self: Sized + 'static,
     {
         event_dispatcher().dispatch(self);
+    }
+
+    fn supports_cluster(&self) -> bool {
+        true
     }
 
     async fn subscribe<H: EventHandler + Default>()
@@ -125,7 +129,7 @@ mod test {
         UserCreated::subscribe::<HandleUserCreated>().await;
     }
 
-    #[derive(Clone)]
+    #[derive(Clone, serde::Serialize, serde::Deserialize)]
     struct UserCreated {
         id: u32,
     }

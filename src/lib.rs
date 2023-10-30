@@ -80,6 +80,8 @@ mod event_dispatcher;
 mod event_listener;
 
 pub use async_trait::async_trait;
+pub use serde;
+
 pub use builder::EventDispatcherBuilder;
 pub use dispatched_event::DispatchedEvent;
 pub use event::*;

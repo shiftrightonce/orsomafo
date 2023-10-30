@@ -163,7 +163,7 @@ mod test {
         assert_eq!(subscribers.is_some(), true);
     }
 
-    #[derive(Clone)]
+    #[derive(Clone, serde::Deserialize, serde::Serialize)]
     struct UserCreated {
         id: u32,
     }

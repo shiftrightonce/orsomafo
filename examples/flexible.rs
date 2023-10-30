@@ -24,7 +24,7 @@ async fn main() {
     });
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 struct UserCreated {
     id: u32,
 }

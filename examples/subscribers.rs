@@ -33,7 +33,7 @@ async fn main() {
     sleep(Duration::from_millis(100)).await;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 struct UserCreated {
     id: u32,
 }

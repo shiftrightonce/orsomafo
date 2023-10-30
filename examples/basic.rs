@@ -34,7 +34,7 @@ async fn main() {
 
 // 5. Create you event
 //    Events must implement "Clone". A of the even is passed to each handler
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
 struct UserCreated {
     id: u32,
 }
