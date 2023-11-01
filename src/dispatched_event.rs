@@ -1,12 +1,36 @@
 #![allow(dead_code)]
-use std::any::Any;
+use chrono::{DateTime, TimeZone, Utc};
 
-#[derive(Debug)]
-pub struct DispatchedEvent(Box<dyn Any + Send + Sync + 'static>);
+use crate::Dispatchable;
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct DispatchedEvent {
+    id: String,
+    created_at: i64,
+    data: String,
+    event: String,
+}
 
 impl DispatchedEvent {
-    pub(crate) fn new(inner: Box<dyn Any + Send + Sync + 'static>) -> Self {
-        Self(inner)
+    pub(crate) fn new(data: String, event: String) -> Self {
+        Self {
+            id: ulid::Ulid::new().to_string().to_lowercase(),
+            created_at: chrono::Utc::now().timestamp(),
+            data,
+            event,
+        }
+    }
+
+    pub fn id(&self) -> String {
+        self.id.clone()
+    }
+
+    pub fn created_at(&self) -> DateTime<Utc> {
+        Utc.timestamp_opt(self.created_at, 0).unwrap()
+    }
+
+    pub(crate) fn event(&self) -> String {
+        self.event.clone()
     }
 
     /// Returns the actual instance of the event
@@ -37,8 +61,7 @@ impl DispatchedEvent {
     ///
     /// }
     /// ```
-    pub fn the_event<T: Clone + 'static>(&self) -> Option<T> {
-        let result: Option<&T> = self.0.downcast_ref();
-        result.cloned()
+    pub fn the_event<T: Dispatchable>(&self) -> Option<T> {
+        serde_json::from_str(&self.data).ok()
     }
 }
