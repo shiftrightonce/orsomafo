@@ -62,7 +62,7 @@ impl EventDispatcherBuilder {
             merge_subscribers(subscribers).await;
             dispatcher.clone()
         } else {
-            let (tx, rx) = mpsc::unbounded_channel::<(String, DispatchedEvent)>();
+            let (tx, rx) = mpsc::unbounded_channel::<DispatchedEvent>();
             let subscribers = self.subscribers;
 
             tokio::spawn(async move {

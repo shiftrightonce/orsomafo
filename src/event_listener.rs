@@ -77,13 +77,13 @@ impl Subscriber {
 }
 
 pub(crate) struct EventListener {
-    chan_rev: UnboundedReceiver<(String, DispatchedEvent)>,
+    chan_rev: UnboundedReceiver<DispatchedEvent>,
 }
 
 impl EventListener {
     pub async fn new(
         subscribers: SubscriberList,
-        receiver: UnboundedReceiver<(String, DispatchedEvent)>,
+        receiver: UnboundedReceiver<DispatchedEvent>,
     ) -> Self {
         merge_subscribers(subscribers).await;
         Self { chan_rev: receiver }
@@ -91,25 +91,26 @@ impl EventListener {
 
     pub async fn receive(&mut self) {
         while let Some(event) = self.chan_rev.recv().await {
+            let name = event.event();
             log::trace!(
                 target: LOG_TITLE,
                 "received dispatched event: {:?}",
-                &event.0
+                &name
             );
 
             if let Some(lock) = REGISTERED_SUBSCRIBERS.get() {
                 let mut list = lock.write().await;
-                if let Some(subscribers) = list.get_mut(&event.0) {
+                if let Some(subscribers) = list.get_mut(&name) {
                     let mut to_remove = Vec::new();
                     for a_subscriber in subscribers.iter().enumerate() {
                         log::trace!(
                             target: LOG_TITLE,
                             "calling handler: {:?}, for event: {:?}",
                             &a_subscriber.1.handler_id(),
-                            &event.0
+                            &name
                         );
 
-                        a_subscriber.1.handle(&event.1).await;
+                        a_subscriber.1.handle(&event).await;
                         if a_subscriber.1.execute_once() {
                             to_remove.push(a_subscriber.0);
                         }

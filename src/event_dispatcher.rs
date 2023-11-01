@@ -7,28 +7,23 @@ pub(crate) static EVENT_DISPATCHER: OnceLock<Arc<EventDispatcher>> = OnceLock::n
 
 #[derive(Debug)]
 pub struct EventDispatcher {
-    sender: UnboundedSender<(String, DispatchedEvent)>,
+    sender: UnboundedSender<DispatchedEvent>,
 }
 
 impl EventDispatcher {
-    pub(crate) fn new(sender: UnboundedSender<(String, DispatchedEvent)>) -> Self {
+    pub(crate) fn new(sender: UnboundedSender<DispatchedEvent>) -> Self {
         Self { sender }
     }
 
     /// Dispatches the event
     pub fn dispatch<T: Dispatchable + Send + Sync + 'static>(&self, event: T) {
-        _ = self.sender.send((
-            T::event(),
-            DispatchedEvent::new(serde_json::to_string(&event).unwrap(), T::event()),
-        ));
+        let event = DispatchedEvent::new(serde_json::to_string(&event).unwrap(), T::event());
+        _ = self.sender.send(event);
     }
 
     pub fn dispatch_json(&self, event: &str) {
         if let Ok(dispatched_event) = serde_json::from_str::<DispatchedEvent>(event) {
-            dbg!(&dispatched_event);
-            _ = self
-                .sender
-                .send((dispatched_event.event(), dispatched_event));
+            _ = self.sender.send(dispatched_event);
         }
     }
 }
