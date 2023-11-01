@@ -5,74 +5,90 @@ Orsomafo is an event dispatcher for rust application
 ## Example (The long way)
 
 ```rust
-
-use async_trait::async_trait;
-use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
+use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder};
 use tokio::time::{sleep, Duration};
 
- #[derive(Clone, Debug)] // Event must be cloneable
- struct MyEvent;
+// Event must be
+// - serializable
+// - deserializable
+// - cloneable
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)] // Event must be cloneable
+struct MyEvent;
 
- impl orsomafo::Dispatchable for MyEvent {} // MyEvent is now dispatchable
+impl orsomafo::Dispatchable for MyEvent {} // MyEvent is now dispatchable
 
-  // create a handler
-  struct MyEventHandler;
-    
-  #[orsomafo::async_trait]
-   impl orsomafo::EventHandler for MyEventHandler {
-        // called when event from "MyEvent" is dispatched
-        async fn handle(&self, dispatched: &DispatchedEvent)  {
-           let event: MyEvent = dispatched.the_event().unwrap();  // Get the instance of "MyEvent"
-           println!("handled my event: {:#?}",event);
-        }
+// create an event handler
+// event handler must implement Default
+#[derive(Default)]
+struct MyEventHandler;
+
+#[orsomafo::async_trait]
+impl orsomafo::EventHandler for MyEventHandler {
+    // called when event from "MyEvent" is dispatched
+    async fn handle(&self, dispatched: &DispatchedEvent) {
+        let event: MyEvent = dispatched.the_event().unwrap(); // Get the instance of "MyEvent"
+        println!(">>>>> handled my event: {:#?}", event);
     }
+}
 
-  #[tokio::main]
-  async fn main() {
-   _ =  EventDispatcherBuilder::new()
-         .listen::<MyEvent, MyEventHandler>()
-         .build().await;
+#[tokio::main]
+async fn main() {
+    _ = EventDispatcherBuilder::new()
+        .listen::<MyEvent, MyEventHandler>()
+        .build()
+        .await;
 
     let event = MyEvent;
     event.dispatch_event();
 
- }
+    // The following line is use to pause the application for
+    // few milliseconds. This will allow us to handle all dispatched events.
+    // In a full application, this line wil not be require.
+    sleep(Duration::from_millis(100)).await;
+}
 
 ```
 
 ## Example (The short way)
 ```rust
-
-use async_trait::async_trait;
-use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
+use orsomafo::{Dispatchable, DispatchedEvent};
 use tokio::time::{sleep, Duration};
 
- #[derive(Clone, Debug)] // Event must be cloneable
- struct MyEvent;
+// Event must be
+// - serializable
+// - deserializable
+// - cloneable
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+struct MyEvent;
 
- impl orsomafo::Dispatchable for MyEvent {} // MyEvent is now dispatchable
+impl orsomafo::Dispatchable for MyEvent {} // MyEvent is now dispatchable
 
-  // create a handler
-  struct MyEventHandler;
-    
-  #[orsomafo::async_trait]
-   impl orsomafo::EventHandler for MyEventHandler {
-        // called when event from "MyEvent" is dispatched
-        async fn handle(&self, dispatched: &DispatchedEvent)  {
-           let event: MyEvent = dispatched.the_event().unwrap();  // Get the instance of "MyEvent"
-           println!("handled my event: {:#?}",event);
-        }
+// create an event handler
+// event handler must implement Default
+#[derive(Default)]
+struct MyEventHandler;
+
+#[orsomafo::async_trait]
+impl orsomafo::EventHandler for MyEventHandler {
+    // called when event from "MyEvent" is dispatched
+    async fn handle(&self, dispatched: &DispatchedEvent) {
+        let event: MyEvent = dispatched.the_event().unwrap(); // Get the instance of "MyEvent"
+        println!(">>> handled my event: {:#?}", event);
     }
+}
 
-  #[tokio::main]
-  async fn main() {
-
-   MyEvent::subscribe::<MyEventHandler>().await;
+#[tokio::main]
+async fn main() {
+    MyEvent::subscribe::<MyEventHandler>().await;
 
     let event = MyEvent;
     event.dispatch_event();
 
- }
+    // The following line is use to pause the application for
+    // few milliseconds. This will allow us to handle all dispatched events.
+    // In a full application, this line wil not be require.
+    sleep(Duration::from_millis(100)).await;
+}
 
 ```
 

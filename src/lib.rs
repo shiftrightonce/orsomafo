@@ -9,6 +9,10 @@
 //! # use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
 //! # use tokio::time::{sleep, Duration};
 //!
+//! // Event must be
+//! // - serializable
+//! // - deserializable
+//! // - cloneable
 //! #[derive(Clone, Debug,serde::Serialize, serde::Deserialize )] // Event must be cloneable
 //! struct MyEvent;
 //!
@@ -34,6 +38,11 @@
 //!    let event = MyEvent;
 //!    event.dispatch_event();
 //!
+//!    // The following line is use to pause the application for
+//!   // few milliseconds. This will allow us to handle all dispatched events.
+//!   // In a full application, this line wil not be require.
+//!   sleep(Duration::from_millis(100)).await;
+//!
 //! }
 //! ```
 //!
@@ -43,6 +52,10 @@
 //! # use orsomafo::{Dispatchable, DispatchedEvent, EventDispatcherBuilder, EventHandler};
 //! # use tokio::time::{sleep, Duration};
 //!
+//! // Event must be
+//! // - serializable
+//! // - deserializable
+//! // - cloneable
 //! #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)] // Event must be clonable
 //! struct MyEvent;
 //!
@@ -70,6 +83,10 @@
 //!    let event = MyEvent;
 //!    event.dispatch_event();
 //!
+//!    // The following line is use to pause the application for
+//!   // few milliseconds. This will allow us to handle all dispatched events.
+//!   // In a full application, this line wil not be require.
+//!   sleep(Duration::from_millis(100)).await;
 //! }
 //! ```
 mod builder;
