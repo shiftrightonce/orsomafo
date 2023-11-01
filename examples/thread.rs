@@ -21,8 +21,8 @@ async fn main() {
     // 3. From another thread, 1000 users are created
     let handle = thread::spawn(move || {
         for id in 1..=1000 {
-            let user = UserCreated { id };
-            user.dispatch_event();
+            let event = UserCreated { id };
+            event.dispatch_event();
         }
     });
 

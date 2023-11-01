@@ -18,13 +18,13 @@ async fn main() {
 
     // 3. When you are ready to dispatch an event, create an instance of your event
     //    and call the `dispatch_event` method on the instance
-    let user = UserCreated { id: 1 };
-    user.dispatch_event(); // Dispatches the event
+    let event = UserCreated { id: 1 };
+    event.dispatch_event(); // Dispatches the event
 
     // 4. The returned "dispatcher" instance from the builder can be used to dispatch
     //    the event.
-    let user2 = UserCreated { id: 2 };
-    dispatcher.dispatch(user2);
+    let event2 = UserCreated { id: 2 };
+    dispatcher.dispatch(event2);
 
     // The following line is use to pause the application for
     // few milliseconds. This will allow us to handle all dispatched events.

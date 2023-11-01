@@ -26,8 +26,8 @@ async fn main() {
         .build() // Same as "subscribe" on the builder
         .await;
 
-    let user = UserCreated { id: 1 };
-    user.dispatch_event();
+    let event = UserCreated { id: 1 };
+    event.dispatch_event();
 
     // pause for a bit
     sleep(Duration::from_millis(100)).await;

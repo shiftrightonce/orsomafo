@@ -9,18 +9,18 @@ async fn main() {
     UserCreated::subscribe::<HandleUserCreated>().await;
 
     // 2. Somewhere in your code create an instance of your event is dispatch it
-    let user = UserCreated { id: 33 };
-    user.dispatch_event();
+    let event = UserCreated { id: 33 };
+    event.dispatch_event();
 
     // Example of multiple instances of the same event being dispatched
-    let users = vec![
+    let events = vec![
         UserCreated { id: 1 },
         UserCreated { id: 2 },
         UserCreated { id: 3 },
     ];
 
-    users.into_iter().for_each(|user| {
-        user.dispatch_event();
+    events.into_iter().for_each(|an_event| {
+        an_event.dispatch_event();
     });
 }
 
