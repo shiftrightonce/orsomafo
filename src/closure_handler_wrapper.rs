@@ -16,7 +16,7 @@ where
 {
     async fn handle(&self, event: &DispatchedEvent) {
         if let Some(func) = &self.0 {
-            (func)(event.the_event().unwrap()).await;
+            (func)(event).await;
         }
     }
 }
