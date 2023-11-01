@@ -7,7 +7,9 @@ use async_trait::async_trait;
 
 /// Types that are dispatchable must implement this trait
 #[async_trait]
-pub trait Dispatchable: serde::Serialize + serde::de::DeserializeOwned + Send + Sync {
+pub trait Dispatchable:
+    serde::Serialize + serde::de::DeserializeOwned + Clone + Send + Sync
+{
     /// By default name of the type is used as the event name
     /// It is recommended to leave this as it is if you don't
     /// have any good reason to change it.
@@ -46,6 +48,12 @@ pub trait Dispatchable: serde::Serialize + serde::de::DeserializeOwned + Send + 
 
     fn supports_cluster(&self) -> bool {
         true
+    }
+
+    fn serialize_event(&self) -> String {
+        let event = DispatchedEvent::new(serde_json::to_string(self).unwrap(), Self::event());
+
+        serde_json::to_string(&event).unwrap()
     }
 
     async fn subscribe<H: EventHandler + Default>()
