@@ -17,9 +17,19 @@ impl EventDispatcher {
 
     /// Dispatches the event
     pub fn dispatch<T: Dispatchable + Send + Sync + 'static>(&self, event: T) {
-        _ = self
-            .sender
-            .send((T::event(), DispatchedEvent::new(Box::new(event))));
+        _ = self.sender.send((
+            T::event(),
+            DispatchedEvent::new(serde_json::to_string(&event).unwrap(), T::event()),
+        ));
+    }
+
+    pub fn dispatch_json(&self, event: &str) {
+        if let Ok(dispatched_event) = serde_json::from_str::<DispatchedEvent>(event) {
+            dbg!(&dispatched_event);
+            _ = self
+                .sender
+                .send((dispatched_event.event(), dispatched_event));
+        }
     }
 }
 
