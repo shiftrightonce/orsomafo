@@ -38,6 +38,12 @@ impl EventDispatcherBuilder {
         self.register(event, the_handler)
     }
 
+    pub fn listen_with<E: Dispatchable>(self, instance: impl EventHandler) -> Self {
+        let event = E::event();
+        let the_handler = instance.to_handler();
+        self.register(event, the_handler)
+    }
+
     pub fn subscribe(mut self, subscriber: Subscriber) -> Self {
         for name_and_handlers in subscriber.subscribers {
             log::trace!(

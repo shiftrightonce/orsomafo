@@ -13,6 +13,7 @@ async fn main() {
         //    listen::<The event you want to listen for, The handler>().
         //    All handler must implement `EventHandler`
         .listen::<UserCreated, HandleUserCreated>()
+        .listen_with::<UserCreated>(HandleUserCreated) // listen_with allows you to pass an instance of the handler
         .build()
         .await;
 
