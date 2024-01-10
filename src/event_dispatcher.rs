@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use crate::{dispatched_event::DispatchedEvent, event::Dispatchable};
+use crate::{dispatched_event::DispatchedEvent, event::Dispatchable, EventDispatcherBuilder};
 use std::sync::{Arc, OnceLock};
 use tokio::sync::mpsc::UnboundedSender;
 
@@ -30,8 +30,9 @@ impl EventDispatcher {
 
 pub fn event_dispatcher() -> Arc<EventDispatcher> {
     if let Some(dispatcher) = EVENT_DISPATCHER.get() {
-        return dispatcher.clone();
+        dispatcher.clone()
+    } else {
+        futures::executor::block_on(EventDispatcherBuilder::new().build());
+        event_dispatcher()
     }
-
-    panic!("event dispatcher is not ready")
 }
