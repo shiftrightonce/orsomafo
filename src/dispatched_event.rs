@@ -8,16 +8,16 @@ pub struct DispatchedEvent {
     id: String,
     created_at: i64,
     data: String,
-    event: String,
+    name: String,
 }
 
 impl DispatchedEvent {
-    pub(crate) fn new(data: String, event: String) -> Self {
+    pub(crate) fn new(data: String, name: String) -> Self {
         Self {
             id: ulid::Ulid::new().to_string().to_lowercase(),
             created_at: chrono::Utc::now().timestamp(),
             data,
-            event,
+            name,
         }
     }
 
@@ -29,8 +29,8 @@ impl DispatchedEvent {
         Utc.timestamp_opt(self.created_at, 0).unwrap()
     }
 
-    pub(crate) fn event(&self) -> String {
-        self.event.clone()
+    pub fn name(&self) -> String {
+        self.name.clone()
     }
 
     /// Returns the actual instance of the event
