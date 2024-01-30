@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.5] - 2024-01-30
+
+[67c92f5](67c92f5c42af9bbfabeb4765e7b06caf9ff41aad)...[6eff0cf](6eff0cfaac575cdbe249f89a8a6115f9a421413a)
+
+### Features
+
+- Expose the name of the event ([2cec039](2cec0390c180ba1af20d284681d24482e4141892))
+- Add the ability to call the handlers on current thread ([bc2c8bf](bc2c8bf1b08fb56fbcef5c8b8cb1bb941b1fca05))
+
+### Example
+
+- Add `once` and `propagate` examples ([d1f9315](d1f931587cf9610bca03a8282c007144f2e79682))
+
 ## [0.3.4] - 2024-01-10
 
 [9af6e25](9af6e256f4cb98462115e4bc2936c1f14fd44662)...[67c92f5](67c92f5c42af9bbfabeb4765e7b06caf9ff41aad)
