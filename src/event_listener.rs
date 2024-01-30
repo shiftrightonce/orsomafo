@@ -91,42 +91,12 @@ impl EventListener {
 
     pub async fn receive(&mut self) {
         while let Some(event) = self.chan_rev.recv().await {
-            let name = event.event();
-            log::trace!(
-                target: LOG_TITLE,
-                "received dispatched event: {:?}",
-                &name
-            );
-
-            if let Some(lock) = REGISTERED_SUBSCRIBERS.get() {
-                let mut list = lock.write().await;
-                if let Some(subscribers) = list.get_mut(&name) {
-                    let mut to_remove = Vec::new();
-                    for a_subscriber in subscribers.iter().enumerate() {
-                        log::trace!(
-                            target: LOG_TITLE,
-                            "calling handler: {:?}, for event: {:?}",
-                            &a_subscriber.1.handler_id(),
-                            &name
-                        );
-
-                        a_subscriber.1.handle(&event).await;
-                        if a_subscriber.1.execute_once() {
-                            to_remove.push(a_subscriber.0);
-                        }
-
-                        if a_subscriber.1.propagate() == false {
-                            break;
-                        }
-                    }
-
-                    if to_remove.is_empty() == false {
-                        for index in to_remove.into_iter() {
-                            subscribers.remove(index);
-                        }
-                    }
-                }
-            }
+            call_event_handlers(event).await;
+            // if let Some(lock) = REGISTERED_SUBSCRIBERS.get() {
+            //     let mut list = lock.write().await;
+            //     if let Some(subscribers) = list.get_mut(&name) {
+            //     }
+            // }
         }
     }
 }
@@ -140,6 +110,44 @@ pub(crate) async fn merge_subscribers(subscribers: SubscriberList) {
         }
 
         list.get_mut(&entry.0).unwrap().extend(entry.1);
+    }
+}
+
+pub(crate) async fn call_event_handlers(event: DispatchedEvent) {
+    let name = event.name();
+    log::trace!(
+        target: LOG_TITLE,
+        "received dispatched event: {:?}",
+        &name
+    );
+    if let Some(lock) = REGISTERED_SUBSCRIBERS.get() {
+        let mut list = lock.write().await;
+        if let Some(subscribers) = list.get_mut(&name) {
+            let mut to_remove = Vec::new();
+            for a_subscriber in subscribers.iter().enumerate() {
+                log::trace!(
+                    target: LOG_TITLE,
+                    "calling handler: {:?}, for event: {:?}",
+                    &a_subscriber.1.handler_id(),
+                    &name
+                );
+
+                a_subscriber.1.handle(&event).await;
+                if a_subscriber.1.execute_once() {
+                    to_remove.push(a_subscriber.0);
+                }
+
+                if a_subscriber.1.propagate() == false {
+                    break;
+                }
+            }
+
+            if !to_remove.is_empty() {
+                for index in to_remove.into_iter() {
+                    subscribers.remove(index);
+                }
+            }
+        }
     }
 }
 

@@ -1,5 +1,8 @@
 #![allow(dead_code)]
-use crate::{dispatched_event::DispatchedEvent, event::Dispatchable, EventDispatcherBuilder};
+use crate::{
+    dispatched_event::DispatchedEvent, event::Dispatchable, event_listener::call_event_handlers,
+    EventDispatcherBuilder,
+};
 use std::sync::{Arc, OnceLock};
 use tokio::sync::mpsc::UnboundedSender;
 
@@ -25,6 +28,12 @@ impl EventDispatcher {
         if let Ok(dispatched_event) = serde_json::from_str::<DispatchedEvent>(event) {
             _ = self.sender.send(dispatched_event);
         }
+    }
+
+    /// Dispatches the event in the current thread
+    pub async fn dispatch_sync<T: Dispatchable + Send + Sync + 'static>(&self, event: T) {
+        let event = DispatchedEvent::new(serde_json::to_string(&event).unwrap(), T::event());
+        call_event_handlers(event).await;
     }
 }
 
