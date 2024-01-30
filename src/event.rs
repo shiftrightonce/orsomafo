@@ -10,7 +10,7 @@ use async_trait::async_trait;
 pub trait Dispatchable:
     serde::Serialize + serde::de::DeserializeOwned + Clone + Send + Sync
 {
-    /// By default name of the type is used as the event name
+    /// By default the name of the type is used as the event name
     /// It is recommended to leave this as it is if you don't
     /// have any good reason to change it.
     fn event() -> String
@@ -132,17 +132,20 @@ pub trait EventHandler: Send + Sync + 'static {
 mod test {
     use super::*;
 
-    #[tokio::test]
-    async fn test_event_dispatching() {
-        UserCreated::subscribe::<HandleUserCreated>().await;
-    }
-
     #[derive(Clone, serde::Serialize, serde::Deserialize)]
     struct UserCreated {
         id: u32,
     }
 
     impl Dispatchable for UserCreated {}
+
+    #[tokio::test]
+    async fn test_event_dispatching() {
+        UserCreated::subscribe::<HandleUserCreated>().await;
+        event_dispatcher()
+            .dispatch_sync(UserCreated { id: 200 })
+            .await;
+    }
 
     #[derive(Default)]
     struct HandleUserCreated;
@@ -152,7 +155,7 @@ mod test {
         async fn handle(&self, dispatched: &DispatchedEvent) {
             let the_event = dispatched.the_event();
 
-            assert_eq!(the_event.is_none(), true);
+            assert_eq!(the_event.is_none(), false);
 
             let event: UserCreated = the_event.unwrap();
             assert_eq!(event.id, 200);
