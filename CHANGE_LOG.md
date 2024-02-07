@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.6] - 2024-02-07
+
+[6eff0cf](6eff0cfaac575cdbe249f89a8a6115f9a421413a)...[8447ba7](8447ba7e0ebbdf50caf7af0a8376ff1429e64251)
+
+### Features
+
+- Add `ref` versions for the dispatched event methods ([af04d42](af04d428293e4a891df2b8d4da6ca0678aff2546))
+
 ## [0.3.5] - 2024-01-30
 
 [67c92f5](67c92f5c42af9bbfabeb4765e7b06caf9ff41aad)...[6eff0cf](6eff0cfaac575cdbe249f89a8a6115f9a421413a)
