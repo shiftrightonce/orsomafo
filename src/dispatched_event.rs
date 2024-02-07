@@ -25,12 +25,28 @@ impl DispatchedEvent {
         self.id.clone()
     }
 
+    pub fn id_ref(&self) -> &String {
+        &self.id
+    }
+
     pub fn created_at(&self) -> DateTime<Utc> {
         Utc.timestamp_opt(self.created_at, 0).unwrap()
     }
 
     pub fn name(&self) -> String {
         self.name.clone()
+    }
+
+    pub fn name_ref(&self) -> &String {
+        &self.name
+    }
+
+    pub fn data(&self) -> String {
+        self.data.clone()
+    }
+
+    pub fn data_ref(&self) -> &String {
+        &self.data
     }
 
     /// Returns the actual instance of the event
@@ -62,6 +78,6 @@ impl DispatchedEvent {
     /// }
     /// ```
     pub fn the_event<T: Dispatchable>(&self) -> Option<T> {
-        serde_json::from_str(&self.data).ok()
+        serde_json::from_str(self.data_ref()).ok()
     }
 }

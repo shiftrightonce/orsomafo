@@ -30,9 +30,9 @@ struct HandleUserCreated;
 #[async_trait]
 impl EventHandler for HandleUserCreated {
     async fn handle(&self, dispatched: &DispatchedEvent) {
-        println!("event id: {:?}", dispatched.id());
-        println!("name: {:?}", dispatched.name());
+        println!("event id: {:?}", dispatched.id_ref());
+        println!("name: {:?}", dispatched.name_ref());
         println!("created at: {:?}", dispatched.created_at());
-        println!("data: {:?}", dispatched.data());
+        println!("data: {:?}", dispatched.data_ref());
     }
 }
