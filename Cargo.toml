@@ -1,6 +1,6 @@
 [package]
 name = "orsomafo"
-version = "0.3.5"
+version = "0.3.6"
 edition = "2021"
 license = "MIT"
 description = "Event dispatcher crate"
@@ -12,18 +12,18 @@ categories = ["asynchronous", "web-programming"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-trait = "0.1.68"
-log = "0.4.19"
-tokio = { version = "1.28.2", features = ["sync", "test-util", "macros"] }
-futures = "0.3.27"
-serde = { version = "1.0.190", features = ["derive"] }
+async-trait = "0.1"
+log = "0.4.20"
+tokio = { version = "1.36", features = ["sync", "test-util", "macros"] }
+futures = "0.3.30"
+serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
-chrono = "0.4.31"
-ulid = { version = "1.0.0", features = ["serde", "rand", "std"] }
+chrono = "0.4"
+ulid = { version = "1.1", features = ["serde", "rand", "std"] }
 
 [dev-dependencies]
-pretty_env_logger = "0.5.0"
-tokio = { version = "1.28.2", features = [
+pretty_env_logger = "0.5"
+tokio = { version = "1.36", features = [
   "sync",
   "test-util",
   "macros",
