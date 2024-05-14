@@ -92,11 +92,6 @@ impl EventListener {
     pub async fn receive(&mut self) {
         while let Some(event) = self.chan_rev.recv().await {
             call_event_handlers(event).await;
-            // if let Some(lock) = REGISTERED_SUBSCRIBERS.get() {
-            //     let mut list = lock.write().await;
-            //     if let Some(subscribers) = list.get_mut(&name) {
-            //     }
-            // }
         }
     }
 }
