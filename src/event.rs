@@ -1,7 +1,7 @@
 use crate::{
     dispatched_event::DispatchedEvent,
     event_dispatcher::event_dispatcher,
-    event_listener::{merge_subscribers, SubscriberList, LOG_TITLE},
+    event_listener::{merge_subscribers, unsubscribe, SubscriberList, LOG_TITLE},
 };
 use async_trait::async_trait;
 
@@ -56,13 +56,14 @@ pub trait Dispatchable:
         serde_json::to_string(&event).unwrap()
     }
 
+    /// Subject to this event
     async fn subscribe<H: EventHandler + Default>()
     where
         Self: Sized,
     {
         crate::setup().await;
 
-        let event = Self::event();
+        let event: String = Self::event();
         let the_handler = H::default().to_handler();
 
         let mut subscriber = SubscriberList::new();
@@ -76,6 +77,14 @@ pub trait Dispatchable:
 
         subscriber.insert(event, vec![the_handler]);
         merge_subscribers(subscriber).await;
+    }
+
+    /// Unsubscribe to this event
+    async fn unsubscribe<H: EventHandler + Default>() {
+        crate::setup().await;
+        let the_handler = H::default().to_handler();
+
+        unsubscribe(Self::event(), the_handler.handler_id()).await;
     }
 }
 

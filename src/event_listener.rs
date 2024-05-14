@@ -103,8 +103,31 @@ pub(crate) async fn merge_subscribers(subscribers: SubscriberList) {
         if !list.contains_key(&entry.0) {
             list.insert(entry.0.clone(), Vec::new());
         }
-
         list.get_mut(&entry.0).unwrap().extend(entry.1);
+    }
+}
+
+pub(crate) async fn unsubscribe(name: String, handler_id: String) {
+    if let Some(lock) = REGISTERED_SUBSCRIBERS.get() {
+        let mut list = lock.write().await;
+        if let Some(subscribers) = list.get_mut(&name) {
+            let mut to_remove = None;
+            for a_subscriber in subscribers.iter().enumerate() {
+                if a_subscriber.1.handler_id() == handler_id {
+                    log::trace!(
+                        target: LOG_TITLE,
+                        "unsubscribing handler: {:?} from event: {:?}",
+                        &a_subscriber.1.handler_id(),
+                        &name
+                    );
+                    to_remove = Some(a_subscriber.0);
+                }
+            }
+
+            if let Some(index) = to_remove {
+                subscribers.remove(index);
+            }
+        }
     }
 }
 
