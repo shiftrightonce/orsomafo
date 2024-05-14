@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.7] - 2024-05-14
+
+[8447ba7](8447ba7e0ebbdf50caf7af0a8376ff1429e64251)...[20eb8f0](20eb8f01579d1a4c8896c5ffb6479682da111c81)
+
+### Bug Fixes
+
+- Remove commented out code ([b9aa402](b9aa40297c4feb07ee28c3e5e860d79762c02be0))
+
+### Features
+
+- Add the ability to unsubscribe from a event ([3272097](32720976855f19eafe2d7551dc6522223e837d3e))
+
+### Example
+
+- Add unsubscribing example ([6043c2e](6043c2ede14c29a514d451d294e1691130c6e1d6))
+
 ## [0.3.6] - 2024-02-07
 
 [6eff0cf](6eff0cfaac575cdbe249f89a8a6115f9a421413a)...[8447ba7](8447ba7e0ebbdf50caf7af0a8376ff1429e64251)
