@@ -169,7 +169,9 @@ pub(crate) async fn call_event_handlers(event: DispatchedEvent) {
     }
 }
 
+#[allow(unused_imports)]
 mod test {
+    use crate::event_dispatcher;
     use async_trait::async_trait;
 
     use super::*;
@@ -188,6 +190,16 @@ mod test {
 
         let subscribers = REGISTERED_SUBSCRIBERS.get();
         assert_eq!(subscribers.is_some(), true);
+    }
+
+    #[tokio::test]
+    async fn test_unsubscribing() {
+        UserCreated2::subscribe::<HandleUserCreated2>().await;
+
+        UserCreated2::unsubscribe::<HandleUserCreated2>().await;
+        event_dispatcher()
+            .dispatch_sync(UserCreated2 { id: 8701 })
+            .await;
     }
 
     #[derive(Clone, serde::Deserialize, serde::Serialize)]
@@ -209,6 +221,27 @@ mod test {
 
             let event: UserCreated = the_event.unwrap();
             assert_eq!(event.id, 200);
+        }
+    }
+
+    #[derive(Clone, serde::Deserialize, serde::Serialize)]
+    struct UserCreated2 {
+        id: u32,
+    }
+
+    impl Dispatchable for UserCreated2 {}
+
+    #[derive(Default)]
+    struct HandleUserCreated2;
+
+    #[async_trait]
+    impl EventHandler for HandleUserCreated2 {
+        async fn handle(&self, dispatched: &DispatchedEvent) {
+            assert!(
+                false,
+                "Shouldn't have handled the event {}",
+                dispatched.name()
+            );
         }
     }
 }
