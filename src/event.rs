@@ -1,9 +1,11 @@
 use crate::{
+    closure_handler_wrapper::ClosureHandlerWrapper,
     dispatched_event::DispatchedEvent,
     event_dispatcher::event_dispatcher,
     event_listener::{merge_subscribers, unsubscribe, SubscriberList, LOG_TITLE},
 };
 use async_trait::async_trait;
+use futures::future::BoxFuture;
 
 /// Types that are dispatchable must implement this trait
 #[async_trait]
@@ -46,6 +48,10 @@ pub trait Dispatchable:
         event_dispatcher().dispatch(self);
     }
 
+    fn dispatch_event_as(self, name: &str) {
+        event_dispatcher().dispatch_str(name, self);
+    }
+
     fn supports_cluster(&self) -> bool {
         true
     }
@@ -79,6 +85,32 @@ pub trait Dispatchable:
         merge_subscribers(subscriber).await;
     }
 
+    async fn subscribe_with(handler: impl EventHandler) {
+        crate::setup().await;
+
+        let event: String = Self::event();
+        let the_handler = handler.to_handler();
+
+        let mut subscriber = SubscriberList::new();
+
+        log::trace!(
+            target: LOG_TITLE,
+            "registered handler: {:?}, for event: {:?}",
+            &event,
+            &the_handler.handler_id()
+        );
+
+        subscriber.insert(event, vec![the_handler]);
+        merge_subscribers(subscriber).await;
+    }
+
+    async fn subscribe_fn(
+        handler: impl Fn(DispatchedEvent) -> BoxFuture<'static, ()> + Send + Sync + 'static,
+    ) {
+        let wrapper = ClosureHandlerWrapper(handler);
+        Self::subscribe_with(wrapper).await;
+    }
+
     /// Unsubscribe to this event
     async fn unsubscribe<H: EventHandler + Default>() {
         crate::setup().await;
@@ -105,14 +137,14 @@ pub trait EventHandler: Send + Sync + 'static {
     ///    
     ///    #[orsomafo::async_trait]
     ///    impl EventHandler for MyEventHandler {
-    ///        async fn handle(&self, event: &DispatchedEvent)  {
+    ///        async fn handle(&self, event: DispatchedEvent)  {
     ///           //...
     ///        }
     ///    }
     ///
     /// }
     /// ```
-    async fn handle(&self, event: &DispatchedEvent);
+    async fn handle(&self, event: DispatchedEvent);
 
     fn to_handler(self) -> Box<Self>
     where
@@ -151,17 +183,28 @@ mod test {
     #[tokio::test]
     async fn test_event_dispatching() {
         UserCreated::subscribe::<HandleUserCreated>().await;
+
+        event_dispatcher()
+            .dispatch_sync(UserCreated { id: 200 })
+            .await;
+    }
+
+    #[tokio::test]
+    async fn test_event_dispatching_with() {
+        UserCreated::subscribe_with(HandleUserCreated).await;
+
         event_dispatcher()
             .dispatch_sync(UserCreated { id: 200 })
             .await;
     }
 
     #[derive(Default)]
+    #[allow(dead_code)]
     struct HandleUserCreated;
 
     #[async_trait]
     impl EventHandler for HandleUserCreated {
-        async fn handle(&self, dispatched: &DispatchedEvent) {
+        async fn handle(&self, dispatched: DispatchedEvent) {
             let the_event = dispatched.the_event();
 
             assert_eq!(the_event.is_none(), false);

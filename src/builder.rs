@@ -6,7 +6,8 @@ use crate::{
     event_dispatcher::{EventDispatcher, EVENT_DISPATCHER},
     event_listener::{merge_subscribers, EventListener, Subscriber, SubscriberList, LOG_TITLE},
 };
-use std::{future::Future, sync::Arc};
+use futures::future::BoxFuture;
+use std::sync::Arc;
 use tokio::sync::mpsc::{self};
 
 #[derive(Default)]
@@ -22,14 +23,22 @@ impl EventDispatcherBuilder {
     }
 
     // TODO: complete implementation that will allow closure to be used as a handler
-    fn listen_fn<F, Fut>(self, event: String, handler: F) -> Self
-    where
-        F: Fn(&DispatchedEvent) -> Fut + Clone + Send + Sync + 'static,
-        Fut: Future + Send + Sync + 'static,
-    {
-        let wrapper = ClosureHandlerWrapper(Some(handler));
+    pub fn listen_fn<E: Dispatchable>(
+        self,
+        handler: impl Fn(DispatchedEvent) -> BoxFuture<'static, ()> + Send + Sync + 'static,
+    ) -> Self {
+        let wrapper = ClosureHandlerWrapper(handler);
 
-        self.register(event, wrapper.to_handler())
+        self.register(E::event(), wrapper.to_handler())
+    }
+
+    pub fn listen_str_fn<F>(self, event: &str, handler: F) -> Self
+    where
+        F: Fn(DispatchedEvent) -> BoxFuture<'static, ()> + Send + Sync + 'static,
+    {
+        let wrapper = ClosureHandlerWrapper(handler);
+
+        self.register(event.to_string(), wrapper.to_handler())
     }
 
     pub fn listen<E: Dispatchable, H: EventHandler + Default>(self) -> Self {
@@ -38,10 +47,20 @@ impl EventDispatcherBuilder {
         self.register(event, the_handler)
     }
 
+    pub fn listen_str<H: EventHandler + Default>(self, event: &str) -> Self {
+        let the_handler = H::default().to_handler();
+        self.register(event.to_string(), the_handler)
+    }
+
     pub fn listen_with<E: Dispatchable>(self, instance: impl EventHandler) -> Self {
         let event = E::event();
         let the_handler = instance.to_handler();
         self.register(event, the_handler)
+    }
+
+    pub fn listen_str_with(self, event: &str, instance: impl EventHandler) -> Self {
+        let the_handler = instance.to_handler();
+        self.register(event.to_string(), the_handler)
     }
 
     pub fn subscribe(mut self, subscriber: Subscriber) -> Self {

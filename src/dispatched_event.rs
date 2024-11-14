@@ -3,7 +3,7 @@ use chrono::{DateTime, TimeZone, Utc};
 
 use crate::Dispatchable;
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct DispatchedEvent {
     id: String,
     created_at: i64,
@@ -67,7 +67,7 @@ impl DispatchedEvent {
     ///    
     ///    #[orsomafo::async_trait]
     ///    impl EventHandler for MyEventHandler {
-    ///        async fn handle(&self, dispatched: &DispatchedEvent)  {
+    ///        async fn handle(&self, dispatched: DispatchedEvent)  {
     ///           let event: MyEvent = dispatched.the_event().unwrap();
     ///           // or
     ///           // let event = dispatched.the_event::<MyEvent>().unwrap()

@@ -25,7 +25,7 @@
 //!  #[orsomafo::async_trait]
 //!   impl orsomafo::EventHandler for MyEventHandler {
 //!        // called when event from "MyEvent" is dispatched
-//!        async fn handle(&self, dispatched: &DispatchedEvent)  {
+//!        async fn handle(&self, dispatched: DispatchedEvent)  {
 //!           let event: MyEvent = dispatched.the_event().unwrap();  // Get the instance of "MyEvent"
 //!           println!("handled my event: {:#?}",event);
 //!        }
@@ -68,7 +68,7 @@
 //!  #[orsomafo::async_trait]
 //!   impl orsomafo::EventHandler for MyEventHandler {
 //!        // called when event from "MyEvent" is dispatched
-//!        async fn handle(&self, dispatched: &DispatchedEvent)  {
+//!        async fn handle(&self, dispatched: DispatchedEvent)  {
 //!           let event: MyEvent = dispatched.the_event().unwrap();  // Get the instance of "MyEvent"
 //!           println!("handled my event: {:#?}",event);
 //!        }

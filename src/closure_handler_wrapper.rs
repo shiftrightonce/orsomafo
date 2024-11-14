@@ -1,22 +1,18 @@
 use crate::{DispatchedEvent, EventHandler};
 use async_trait::async_trait;
-use std::future::Future;
+use futures::future::BoxFuture;
 
 #[derive(Default)]
-pub(crate) struct ClosureHandlerWrapper<F, Fut>(pub(crate) Option<F>)
+pub(crate) struct ClosureHandlerWrapper<F>(pub(crate) F)
 where
-    F: Fn(&DispatchedEvent) -> Fut + Clone + 'static,
-    Fut: Future;
+    F: Fn(DispatchedEvent) -> BoxFuture<'static, ()> + Send + Sync + 'static;
 
 #[async_trait]
-impl<F, Fut> EventHandler for ClosureHandlerWrapper<F, Fut>
+impl<F> EventHandler for ClosureHandlerWrapper<F>
 where
-    F: Fn(&DispatchedEvent) -> Fut + Clone + Sync + Send + 'static,
-    Fut: Future + Send + 'static,
+    F: Fn(DispatchedEvent) -> BoxFuture<'static, ()> + Send + Sync + 'static,
 {
-    async fn handle(&self, event: &DispatchedEvent) {
-        if let Some(func) = &self.0 {
-            (func)(event).await;
-        }
+    async fn handle(&self, event: DispatchedEvent) {
+        (self.0)(event).await;
     }
 }
