@@ -8,6 +8,9 @@ async fn main() {
     // 1. Subscribe directly to the event using the event's static `subscribe` method
     UserCreated::subscribe::<HandleUserCreated>().await;
 
+    // 1.b You can subscribe with an instance of your handler
+    UserCreated::subscribe_with(HandleUserCreated).await;
+
     // 2. Somewhere in your code create an instance of your event is dispatch it
     let event = UserCreated { id: 33 };
     event.dispatch_event();
@@ -36,7 +39,7 @@ struct HandleUserCreated;
 
 #[async_trait]
 impl EventHandler for HandleUserCreated {
-    async fn handle(&self, dispatched: &DispatchedEvent) {
+    async fn handle(&self, dispatched: DispatchedEvent) {
         let event: UserCreated = dispatched.the_event().unwrap();
         println!("we are handling user created event: {:?}", event.id)
     }

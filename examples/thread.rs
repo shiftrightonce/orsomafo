@@ -44,7 +44,7 @@ struct HandleUserCreated;
 
 #[async_trait]
 impl EventHandler for HandleUserCreated {
-    async fn handle(&self, dispatched: &DispatchedEvent) {
+    async fn handle(&self, dispatched: DispatchedEvent) {
         let event: UserCreated = dispatched.the_event().unwrap();
         println!("HandleUserCreated: user {:?} was created", event.id)
     }
@@ -60,7 +60,7 @@ impl Default for SendWelcomeEmail {
 
 #[async_trait]
 impl EventHandler for SendWelcomeEmail {
-    async fn handle(&self, event: &DispatchedEvent) {
+    async fn handle(&self, event: DispatchedEvent) {
         let user = event.the_event::<UserCreated>().unwrap();
         println!(
             "SendWelcomeEmail: Sending welcoming email to new user {:?} from {:?}",

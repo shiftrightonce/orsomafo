@@ -40,7 +40,7 @@ struct HandleNumberAddedEvent;
 
 #[async_trait]
 impl orsomafo::EventHandler for HandleNumberAddedEvent {
-    async fn handle(&self, event: &DispatchedEvent) {
+    async fn handle(&self, event: DispatchedEvent) {
         eprintln!(
             "-----> You shouldn't see this message for event: {}",
             event.name()

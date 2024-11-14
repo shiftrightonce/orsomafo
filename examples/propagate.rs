@@ -30,7 +30,7 @@ struct HandleUserCreated;
 
 #[async_trait]
 impl EventHandler for HandleUserCreated {
-    async fn handle(&self, dispatched: &DispatchedEvent) {
+    async fn handle(&self, dispatched: DispatchedEvent) {
         let event: UserCreated = dispatched.the_event().unwrap();
         println!("User with ID: {} created", event.id);
     }
@@ -46,7 +46,7 @@ struct HandleUserCreated2;
 
 #[async_trait]
 impl EventHandler for HandleUserCreated2 {
-    async fn handle(&self, dispatched: &DispatchedEvent) {
+    async fn handle(&self, dispatched: DispatchedEvent) {
         println!("Handling event with ID: {}", dispatched.id());
     }
 }

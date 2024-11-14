@@ -9,7 +9,11 @@ async fn main() {
     // 1. Subscriber allows you to register a list of event listeners.
     let handlers = Subscriber::new()
         .listen::<UserCreated, SendWelcomeEmail>()
-        .listen::<UserCreated, HandleUserCreated>();
+        .listen_with::<UserCreated>(SendWelcomeEmail::default()) // Use an existing instance of your handler
+        .listen::<UserCreated, HandleUserCreated>()
+        .listen_fn::<UserCreated>(|d| {
+            Box::pin(async move { println!("closure handling event. data: {:#?}", d.data()) })
+        });
 
     let _ = EventDispatcherBuilder::new()
         // 2. Use the "subscribe" method on the builder to subscribe to the list of events
@@ -23,6 +27,7 @@ async fn main() {
     Subscriber::new()
         .listen::<UserCreated, SendWelcomeEmail>()
         .listen::<UserCreated, HandleUserCreated>()
+        .listen_with::<UserCreated>(HandleUserCreated) // Use an existing instance of your handler
         .build() // Same as "subscribe" on the builder
         .await;
 
@@ -45,7 +50,7 @@ struct HandleUserCreated;
 
 #[async_trait]
 impl EventHandler for HandleUserCreated {
-    async fn handle(&self, dispatched: &DispatchedEvent) {
+    async fn handle(&self, dispatched: DispatchedEvent) {
         let event: UserCreated = dispatched.the_event().unwrap();
         println!("we are handling user created event: {:?}", event.id)
     }
@@ -61,7 +66,7 @@ impl Default for SendWelcomeEmail {
 
 #[async_trait]
 impl EventHandler for SendWelcomeEmail {
-    async fn handle(&self, event: &DispatchedEvent) {
+    async fn handle(&self, event: DispatchedEvent) {
         let user = event.the_event::<UserCreated>().unwrap();
         println!(
             "Sending welcoming email to new user {:?} from {:?}",

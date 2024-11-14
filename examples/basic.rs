@@ -51,7 +51,7 @@ struct HandleUserCreated;
 // 8. Event handler must implement "soma::EventHandler"
 #[async_trait]
 impl EventHandler for HandleUserCreated {
-    async fn handle(&self, dispatched: &DispatchedEvent) {
+    async fn handle(&self, dispatched: DispatchedEvent) {
         let event: UserCreated = dispatched.the_event().unwrap();
         println!("we are handling user created event: {:?}", event.id)
     }
