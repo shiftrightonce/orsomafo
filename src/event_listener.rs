@@ -153,7 +153,7 @@ pub(crate) async fn call_event_handlers(event: DispatchedEvent) {
                     &name
                 );
 
-                a_subscriber.1.handle(&event).await;
+                a_subscriber.1.handle(event.clone()).await;
                 if a_subscriber.1.execute_once() {
                     to_remove.push(a_subscriber.0);
                 }
@@ -217,7 +217,7 @@ mod test {
 
     #[async_trait]
     impl EventHandler for HandleUserCreated {
-        async fn handle(&self, dispatched: &DispatchedEvent) {
+        async fn handle(&self, dispatched: DispatchedEvent) {
             let the_event = dispatched.the_event();
 
             assert_eq!(the_event.is_none(), true);
@@ -239,7 +239,7 @@ mod test {
 
     #[async_trait]
     impl EventHandler for HandleUserCreated2 {
-        async fn handle(&self, dispatched: &DispatchedEvent) {
+        async fn handle(&self, dispatched: DispatchedEvent) {
             assert!(
                 false,
                 "Shouldn't have handled the event {}",
