@@ -4,7 +4,8 @@ use crate::{
     dispatched_event::DispatchedEvent,
     event::{Dispatchable, EventHandler},
 };
-use std::{collections::HashMap, future::Future, sync::OnceLock};
+use futures::future::BoxFuture;
+use std::{collections::HashMap, sync::OnceLock};
 use tokio::sync::{mpsc::UnboundedReceiver, RwLock};
 
 pub(crate) const LOG_TITLE: &str = "orsomafo";
@@ -25,13 +26,11 @@ impl Subscriber {
         }
     }
 
-    // TODO: complete implementation that will allow closure to be used as a handler
-    fn listen_fn<E: Dispatchable, F, Fut>(self, handler: F) -> Self
-    where
-        F: Fn(&DispatchedEvent) -> Fut + Clone + Send + Sync + 'static,
-        Fut: Future + Send + Sync + 'static,
-    {
-        let wrapper = ClosureHandlerWrapper(Some(handler));
+    pub fn listen_fn<E: Dispatchable>(
+        self,
+        handler: impl Fn(DispatchedEvent) -> BoxFuture<'static, ()> + Send + Sync + 'static,
+    ) -> Self {
+        let wrapper = ClosureHandlerWrapper(handler);
         let event = E::event();
 
         self.register(event, wrapper.to_handler())
@@ -42,6 +41,10 @@ impl Subscriber {
         let handler = H::default().to_handler();
 
         self.register(event, handler)
+    }
+
+    pub fn listen_with<E: Dispatchable>(self, instance: impl EventHandler) -> Self {
+        self.register(E::event(), instance.to_handler())
     }
 
     fn register(mut self, event_name: String, handler: Box<dyn EventHandler>) -> Self {
