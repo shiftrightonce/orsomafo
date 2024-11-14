@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2024-11-14
+
+[20eb8f0](20eb8f01579d1a4c8896c5ffb6479682da111c81)...[92e4ccb](92e4ccb4d4ab5b80acf1292058e6012d9141247c)
+
+### Features
+
+- Add the ability to use a closure as a handler ([deb8bfb](deb8bfbebee7d96fd8b7c76194f7314a4fc0c8b2))
+- Event handler now takes ownership of the event ([f3f9205](f3f9205aa67e6857fb25c38e53cfd87b268939e4)), BREAKING CHANGE:Previously, the event was passed by
+reference.
+- Add the ability to listen and dispatch event by string ([77ec1d3](77ec1d3db8c095f6f9bda80e2b5a5b40662c435e))
+
+### Example
+
+- Update examples to take ownership of the event ([09b1358](09b1358ead24db9cc6a41cb2cb990137c96250e9))
+- Add `closure` and `string` examples ([84563be](84563be4adb92ffbeadbce09df0ee82e736e9bf3))
+
 ## [0.3.7] - 2024-05-14
 
 [8447ba7](8447ba7e0ebbdf50caf7af0a8376ff1429e64251)...[20eb8f0](20eb8f01579d1a4c8896c5ffb6479682da111c81)
