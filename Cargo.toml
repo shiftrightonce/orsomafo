@@ -12,7 +12,7 @@ categories = ["asynchronous", "web-programming"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-trait = "0.1.89"
+async-trait = "0.2.0"
 log = "0.4.29"
 tokio = { version = "1.48.0", features = ["sync", "test-util", "macros"] }
 futures = "0.3.30"
