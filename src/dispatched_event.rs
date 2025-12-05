@@ -1,11 +1,12 @@
 #![allow(dead_code)]
 use chrono::{DateTime, TimeZone, Utc};
+use uuid::Uuid;
 
 use crate::Dispatchable;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct DispatchedEvent {
-    id: String,
+    id: Uuid,
     created_at: i64,
     data: String,
     name: String,
@@ -14,30 +15,37 @@ pub struct DispatchedEvent {
 impl DispatchedEvent {
     pub(crate) fn new(data: String, name: String) -> Self {
         Self {
-            id: ulid::Ulid::new().to_string().to_lowercase(),
+            id: Uuid::now_v7(),
             created_at: chrono::Utc::now().timestamp(),
             data,
             name,
         }
     }
 
-    pub fn id(&self) -> String {
+    pub fn id(&self) -> Uuid {
         self.id.clone()
     }
 
-    pub fn id_ref(&self) -> &String {
+    pub fn id_ref(&self) -> &Uuid {
         &self.id
     }
 
     pub fn created_at(&self) -> DateTime<Utc> {
-        Utc.timestamp_opt(self.created_at, 0).unwrap()
+        Utc.timestamp_opt(self.created_at, 0)
+            .single()
+            .expect("could not parse event timestamp")
+    }
+
+    /// Returns the timestamp
+    pub fn created_at_ts(&self) -> i64 {
+        self.created_at
     }
 
     pub fn name(&self) -> String {
         self.name.clone()
     }
 
-    pub fn name_ref(&self) -> &String {
+    pub fn name_ref(&self) -> &str {
         &self.name
     }
 
@@ -45,7 +53,7 @@ impl DispatchedEvent {
         self.data.clone()
     }
 
-    pub fn data_ref(&self) -> &String {
+    pub fn data_ref(&self) -> &str {
         &self.data
     }
 
