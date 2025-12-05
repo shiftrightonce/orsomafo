@@ -20,12 +20,18 @@ impl EventDispatcher {
 
     /// Dispatches the event
     pub fn dispatch<T: Dispatchable>(&self, event: T) {
-        let event = DispatchedEvent::new(serde_json::to_string(&event).unwrap(), T::event());
+        let event = DispatchedEvent::new(
+            serde_json::to_string(&event).expect("could not serialize event"),
+            T::event(),
+        );
         _ = self.sender.send(event);
     }
 
     pub fn dispatch_str(&self, name: &str, event: impl Dispatchable) {
-        let event = DispatchedEvent::new(serde_json::to_string(&event).unwrap(), name.to_string());
+        let event = DispatchedEvent::new(
+            serde_json::to_string(&event).expect("could not serialize event"),
+            name.to_string(),
+        );
         _ = self.sender.send(event);
     }
 
@@ -37,7 +43,10 @@ impl EventDispatcher {
 
     /// Dispatches the event in the current thread
     pub async fn dispatch_sync<T: Dispatchable + Send + Sync + 'static>(&self, event: T) {
-        let event = DispatchedEvent::new(serde_json::to_string(&event).unwrap(), T::event());
+        let event = DispatchedEvent::new(
+            serde_json::to_string(&event).expect("could not serialize event"),
+            T::event(),
+        );
         call_event_handlers(event).await;
     }
 }

@@ -57,7 +57,10 @@ pub trait Dispatchable:
     }
 
     fn serialize_event(&self) -> String {
-        let event = DispatchedEvent::new(serde_json::to_string(self).unwrap(), Self::event());
+        let event = DispatchedEvent::new(
+            serde_json::to_string(self).expect("could not serialize event"),
+            Self::event(),
+        );
 
         serde_json::to_string(&event).unwrap()
     }

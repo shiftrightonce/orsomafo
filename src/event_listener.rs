@@ -106,7 +106,9 @@ pub(crate) async fn merge_subscribers(subscribers: SubscriberList) {
         if !list.contains_key(&entry.0) {
             list.insert(entry.0.clone(), Vec::new());
         }
-        list.get_mut(&entry.0).unwrap().extend(entry.1);
+        list.get_mut(&entry.0)
+            .expect("could not get a 'mut' reference to the subs list")
+            .extend(entry.1);
     }
 }
 
